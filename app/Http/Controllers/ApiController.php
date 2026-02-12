@@ -81,7 +81,7 @@ class ApiController extends Controller
 
     // GET /api/products/{id} (detail)
     public function show($id) {
-        // Get product with joins instead of eager loading
+        // detail produk
         $product = Products::query()
             ->leftJoin('categories', 'products.category_id', '=', 'categories.category_id')
             ->leftJoin('suppliers', 'products.supplier_id', '=', 'suppliers.supplier_id')
@@ -103,7 +103,7 @@ class ApiController extends Controller
             ], 404);
         }
             
-        // Get total sold from order_details
+        // ambil data total terjual quantity
         $totalSold = DB::table('order_details')
             ->where('product_id', $id)
             ->sum('quantity');
