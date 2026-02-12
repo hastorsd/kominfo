@@ -81,8 +81,27 @@ class ApiController extends Controller
 
     // GET /api/products/{id} (detail)
     public function show($id) {
-        $product = Products::with(['category', 'supplier'])
-            ->findOrFail($id);
+        // Get product with joins instead of eager loading
+        $product = Products::query()
+            ->leftJoin('categories', 'products.category_id', '=', 'categories.category_id')
+            ->leftJoin('suppliers', 'products.supplier_id', '=', 'suppliers.supplier_id')
+            ->select(
+                'products.*',
+                'categories.category_name',
+                'categories.description as category_description',
+                'suppliers.company_name as supplier_name',
+                'suppliers.contact_name as supplier_contact',
+                'suppliers.phone as supplier_phone'
+            )
+            ->where('products.product_id', $id)
+            ->first();
+
+        if (!$product) {
+            return response()->json([
+                'message' => 'Product not found',
+                'status' => 404
+            ], 404);
+        }
             
         // Get total sold from order_details
         $totalSold = DB::table('order_details')
